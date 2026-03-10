@@ -27,11 +27,9 @@ MOCK_RESPONSE_JSON = {
 
 def _make_mock_client(response_text: str):
     client = MagicMock()
-    message = MagicMock()
-    content_block = MagicMock()
-    content_block.text = response_text
-    message.content = [content_block]
-    client.messages.create.return_value = message
+    response = MagicMock()
+    response.text = response_text
+    client.models.generate_content.return_value = response
     return client
 
 
@@ -81,6 +79,5 @@ def test_parse_all_unparsed(db, player_id):
     count = parser.parse_all_unparsed(player_id)
     assert count == 1
 
-    # Verify the hand was updated
     hands = db.get_unparsed_hands(player_id)
     assert len(hands) == 0

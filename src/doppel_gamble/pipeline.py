@@ -64,16 +64,16 @@ async def run_pipeline(config: Config):
         print(f"  YouTube scraper failed: {e}")
 
     # 4. LLM parsing
-    if config.anthropic_api_key:
-        print("Parsing hands with Claude...")
+    if config.gemini_api_key:
+        print("Parsing hands with Gemini...")
         try:
-            parser = LLMParser(db, config.anthropic_api_key)
+            parser = LLMParser(db, config.gemini_api_key)
             parsed_count = parser.parse_all_unparsed(player_id)
             print(f"  Parsed {parsed_count} hands")
         except Exception as e:
             print(f"  LLM parser failed: {e}")
     else:
-        print("Skipping LLM parsing (no ANTHROPIC_API_KEY)")
+        print("Skipping LLM parsing (no GEMINI_API_KEY)")
 
     # 5. Export
     print("Exporting data...")

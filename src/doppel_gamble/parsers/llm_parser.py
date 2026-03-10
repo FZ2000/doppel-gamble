@@ -1,30 +1,28 @@
 import json
 from datetime import datetime, timezone
 
-import anthropic
+from google import genai
 
 from ..db.repository import Repository
 from .prompts import HAND_PARSE_SYSTEM, HAND_PARSE_USER
 
 
 class LLMParser:
-    def __init__(self, db: Repository, api_key: str, model: str = "claude-sonnet-4-20250514"):
+    def __init__(self, db: Repository, api_key: str, model: str = "gemini-2.5-flash"):
         self.db = db
-        self.client = anthropic.Anthropic(api_key=api_key)
+        self.client = genai.Client(api_key=api_key)
         self.model = model
 
     def parse_hand(self, raw_text: str) -> dict | None:
         """Parse a single hand description into structured JSON."""
-        response = self.client.messages.create(
+        prompt = HAND_PARSE_SYSTEM + "\n\n" + HAND_PARSE_USER.format(raw_text=raw_text)
+
+        response = self.client.models.generate_content(
             model=self.model,
-            max_tokens=2000,
-            system=HAND_PARSE_SYSTEM,
-            messages=[
-                {"role": "user", "content": HAND_PARSE_USER.format(raw_text=raw_text)}
-            ],
+            contents=prompt,
         )
 
-        content = response.content[0].text.strip()
+        content = response.text.strip()
         if content.startswith("```"):
             content = content.split("\n", 1)[1].rsplit("```", 1)[0].strip()
 

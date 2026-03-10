@@ -50,6 +50,9 @@ class Config:
     raw_dir: Path = field(default=None)
     db_path: Path = field(default=None)
     scraper: ScraperConfig = field(default_factory=ScraperConfig)
+    gemini_api_key: str = field(
+        default_factory=lambda: os.environ.get("GEMINI_API_KEY", "")
+    )
     anthropic_api_key: str = field(
         default_factory=lambda: os.environ.get("ANTHROPIC_API_KEY", "")
     )
