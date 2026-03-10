@@ -8,7 +8,7 @@ from .prompts import HAND_PARSE_SYSTEM, HAND_PARSE_USER
 
 
 class LLMParser:
-    def __init__(self, db: Repository, api_key: str, model: str = "gemini-2.5-flash"):
+    def __init__(self, db: Repository, api_key: str, model: str = "gemini-3-flash-preview"):
         self.db = db
         self.client = genai.Client(api_key=api_key)
         self.model = model
