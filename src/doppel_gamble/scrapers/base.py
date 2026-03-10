@@ -19,7 +19,9 @@ class BaseScraper(ABC):
         await self._rate_limit()
         page = await self.ctx.new_page()
         try:
-            await page.goto(url, wait_until="networkidle", timeout=self.config.timeout_ms)
+            await page.goto(url, wait_until="domcontentloaded", timeout=self.config.timeout_ms)
+            # Give JS a moment to render dynamic content
+            await page.wait_for_timeout(3000)
             if wait_selector:
                 await page.wait_for_selector(wait_selector, timeout=self.config.timeout_ms)
             html = await page.content()

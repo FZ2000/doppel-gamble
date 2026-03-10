@@ -91,9 +91,35 @@ def parse_tournaments_html(html: str) -> list[dict]:
 class HendonMobScraper(BaseScraper):
     BASE_URL = "https://pokerdb.thehendonmob.com"
 
+    async def _get_page_with_cf_wait(self, url: str) -> str:
+        """Navigate to page and wait for Cloudflare challenge to resolve."""
+        await self._rate_limit()
+        page = await self.ctx.new_page()
+        try:
+            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+
+            # Wait for Cloudflare challenge to resolve (up to 30s)
+            for _ in range(15):
+                title = await page.title()
+                if "just a moment" not in title.lower():
+                    break
+                await page.wait_for_timeout(2000)
+
+            # Wait for table to appear
+            try:
+                await page.wait_for_selector("table", timeout=15000)
+            except Exception:
+                pass
+
+            html = await page.content()
+            self.db.store_raw_scrape(url=url, content=html)
+            return html
+        finally:
+            await page.close()
+
     async def scrape(self, player_id: int, hendonmob_id: str = "53", **kwargs) -> list[dict]:
         url = f"{self.BASE_URL}/player.php?a=r&n={hendonmob_id}"
-        html = await self._get_page(url, wait_selector="table")
+        html = await self._get_page_with_cf_wait(url)
 
         tournaments = parse_tournaments_html(html)
 
