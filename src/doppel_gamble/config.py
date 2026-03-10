@@ -2,6 +2,12 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+# Load .env from project root (walks up from config.py)
+_project_root = Path(__file__).resolve().parent.parent.parent
+load_dotenv(_project_root / ".env")
+
 
 @dataclass
 class ScraperConfig:

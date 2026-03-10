@@ -12,6 +12,7 @@ dependencies = [
     "beautifulsoup4>=4.12",
     "anthropic>=0.42",
     "yt-dlp>=2024.1",
+    "python-dotenv>=1.0",
 ]
 
 [project.optional-dependencies]
